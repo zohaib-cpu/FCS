@@ -6,28 +6,45 @@ pipeline {
     }
 
     stages {
-        stage('Install') {
+
+        stage('Install Frontend') {
             steps {
-                bat 'npm install'
+                dir('frontend') {
+                    bat 'npm install'
+                }
             }
         }
 
-        stage('Test') {
+        stage('Build Frontend') {
             steps {
-                echo 'Skipping tests - no test script found'
+                dir('frontend') {
+                    bat 'npm run build'
+                }
             }
         }
 
-        stage('Build') {
+        stage('Deploy Frontend to Vercel') {
             steps {
-                bat 'npm run build'
+                dir('frontend') {
+                    bat "npx vercel --prod --yes --token=%VERCEL_TOKEN%"
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Install Backend') {
             steps {
-                bat 'npx vercel --prod --yes --token=%VERCEL_TOKEN%'
+                dir('backend') {
+                    bat 'npm install'
+                }
             }
         }
+
+        // Optional: backend build ya test add kar sakte ho
+        stage('Backend Ready') {
+            steps {
+                echo 'Backend dependencies installed (no build step).'
+            }
+        }
+
     }
 }
